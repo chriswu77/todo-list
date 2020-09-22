@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ToDo List</title>
+        <link href="stylesheets/reset.css" rel="stylesheet">
+        <link href="stylesheets/style.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/126e7e74aa.js" crossorigin="anonymous"></script>
+    </head>
+
+    <body>
+        <div id="main-container">
+            <div id="left-bar">
+                <div id="heading" class="underline">
+                    <h1 id="title">ToDo List</h1>
+                </div>
+                <div id="shortcuts-list">
+                    <div id="shortcuts-title" class="underline">
+                        <h2>Shortcuts</h2>
+                    </div>
+                    <div id="today-container">
+                        <div class="shortcut-text">Today</div>
+                        <div id="today-task-num" class="task-num-style">2</div>
+                    </div>
+                    <div id="week-container">
+                        <div class="shortcut-text">Next 7 Days</div>
+                        <div id="week-task-num" class="task-num-style">2</div>
+                    </div>
+                </div>
+                <div id="project-list">
+                    <div id="project-list-heading" class="underline">
+                        <h2 id="project-title">Projects</h2>
+                        <i id="add-proj-btn" class="fas fa-plus"></i>
+                    </div>
+
+                    <div id="proj-0" class="project-item-container">
+                        <div id="proj-0-view-1" class="view-1">
+                            <i class="fas fa-chevron-right"></i>
+                            <div class="click-proj">
+                                <div id="proj-0-name" class="shortcut-text">Default Project</div>
+                                <div id="proj-0-task-num" class="task-num-style">5</div>
+                            </div>
+                        </div>
+                        <div id="proj-0-view-2" class="view-2">
+                            <div class="proj-items shortcut-text">Task 1</div>
+                            <div class="proj-items shortcut-text">Task 2</div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div id="content-container">
+                <div id="add-container">
+                    <button id="add-button">
+                        <i id="add-task-sign"class="fas fa-plus"></i>
+                        <p>New Task</p>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </body>
+</html>
