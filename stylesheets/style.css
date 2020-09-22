@@ -1,0 +1,141 @@
+html, body {
+    background-color: #FFFFFF;
+    font-family: 'IBM Plex Sans', sans-serif;
+    height: 100%;
+}
+
+#main-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#left-bar, #project-list, #content-container, #shortcuts-list {
+    display: flex;
+    flex-direction: column;
+}
+
+#heading, #project-list-heading, #shortcuts-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#heading, #shortcuts-list, #project-list {
+    padding-top: 40px;
+}
+
+#title {
+    font-size: 30px;
+    font-weight: 500;
+}
+
+#project-title, #shortcuts-title {
+    font-weight: 400;
+    font-size: 25px;
+}
+
+#add-proj-btn {
+    font-size: 18px;
+    color: red;
+    cursor: pointer;
+}
+
+#title, #project-title {
+    color: #2d2d2d;
+}
+
+.underline {
+    border-bottom: 2px solid #2d2d2d;
+    padding-bottom: 5px;
+}
+
+#left-bar {
+    background-color: #FAFAFA;
+    width: 20%;
+    padding: 0 30px;
+}
+
+#content-container {
+    width: 80%;
+    padding: 0 50px;
+}
+
+#today-container, #week-container {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 15px;
+    cursor: pointer;
+}
+
+.shortcut-text {
+    font-size: 18px;
+    font-weight: 300;
+}
+
+#today-task-num, #week-task-num {
+
+}
+
+.task-num-style {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    margin-left: 10px;
+    background-color: lightblue;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+}
+
+.project-item-container {
+    display: flex;
+    flex-direction: column;
+    padding-top: 15px;
+}
+
+.fa-chevron-right {
+    margin-right: 10px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.view-1, .click-proj {
+    display: flex;
+    align-items: center;
+}
+
+.click-proj {
+    cursor: pointer;
+    width: 100%;
+}
+
+.view-2 {
+    display: flex;
+    flex-direction: column;
+    padding-left: 21.25px;
+}
+
+.proj-items {
+    padding-top: 10px;
+}
+
+#add-container {
+    padding-top: 22px;
+}
+
+#add-button {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: #FFFFFF;
+    background-color:#52A5FE;
+    font-size: 25px;
+    border: 3px solid #FFFFFF;
+    border-radius: 10px;
+}
+
+#add-task-sign {
+    margin-right: 10px;
+}
