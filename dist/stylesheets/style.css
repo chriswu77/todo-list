@@ -119,10 +119,17 @@ html, body {
 
 .proj-items {
     padding-top: 10px;
+    cursor: pointer;
 }
 
 #add-container {
-    padding-top: 22px;
+    /* padding-top: 22px; */
+    padding-top: 15px;
+}
+
+.underline-gray {
+    padding-bottom: 5px;
+    border-bottom: 2px solid #E5E5E5;
 }
 
 #add-button {
@@ -134,8 +141,48 @@ html, body {
     font-size: 25px;
     border: 3px solid #FFFFFF;
     border-radius: 10px;
+    cursor: pointer;
 }
 
 #add-task-sign {
     margin-right: 10px;
+}
+
+.proj-display-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.proj-title-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 40px;;
+}
+
+.proj-title {
+    font-size: 25px;
+}
+
+.edit-btns {
+    display: flex;
+    align-items: center;
+}
+
+.edit-btn, .trash-btn {
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.trash-btn {
+    margin-left: 20px;
+}
+
+.proj-list-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tasks {
+    display: flex;
 }
