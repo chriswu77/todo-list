@@ -1,15 +1,15 @@
 import uniqid from 'uniqid';
-import Task from './Task';
+import TaskList from './TaskList';
 
-export default class Project {
+export default class ProjectList {
+
     constructor () {
         this.projects = [];
     }
 
     addProject (name) {
         const id = uniqid();
-        const taskList = new Task();
-
+        const taskList = new TaskList();
         const project = {id, name, taskList};
         this.projects.push(project);
 
@@ -27,11 +27,6 @@ export default class Project {
         this.persistData();
     }
 
-    renameProject (id, newName) {
-        const index = id;
-        this.projects[index].name = newName;
-    }
-
     persistData() {
         localStorage.setItem('projects', JSON.stringify(this.projects));
     }
@@ -47,4 +42,26 @@ export default class Project {
         return this.projects.length;
     }
 
+    getProject (id) {
+        const index = this.projects.findIndex(proj => proj.id === id);
+        return this.projects[index];
+    }
+
+    remakeTaskList (oldList) {
+        const newList = new TaskList();
+        newList.tasks = oldList.tasks;
+        return newList;
+    }
+
+    getTaskList (projectID) {
+        const project = this.getProject(projectID);
+        const taskList = this.remakeTaskList(project.taskList);
+        return taskList;
+    }
+
+    getNumTasks (id) {
+        const taskList = this.getTaskList(id);
+        const numTasks = taskList.getNumTasks();
+        return numTasks;
+    }
 }

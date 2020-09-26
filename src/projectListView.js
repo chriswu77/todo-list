@@ -43,6 +43,11 @@ export const renderProjectTasks = (taskArray, projectID) => {
     });
 };
 
+export const hideTasks = projectID => {
+    const dropdownView = document.querySelector(`[data-viewid="${projectID}"]`);
+    dropdownView.innerHTML = '';
+};
+
 // hide tasks function
 
 export const renderSavedProjects = projArray => {
