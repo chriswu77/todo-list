@@ -35,6 +35,8 @@ const renderNumTasks = taskArray => {
 export const renderProjectTasks = (taskArray, projectID) => {
     const dropdownView = document.querySelector(`[data-viewid="${projectID}"]`);
 
+    dropdownView.innerHTML = '';
+
     taskArray.forEach(task => {
         const markup = `
         <div class="proj-items shortcut-text" data-taskid="${task.id}">${task.title}</div>

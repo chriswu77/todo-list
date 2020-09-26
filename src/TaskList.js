@@ -6,7 +6,7 @@ export default class TaskList {
         this.tasks = [];
     }
 
-    addTask (title, description, dueDate, priority, projectName, notes, status = true) {
+    addTask (title, description, dueDate, priority, projectName, notes = '', status = true) {
         const id = uniqid();
 
         const task = {id, title, description, dueDate, priority, projectName, notes, status};
