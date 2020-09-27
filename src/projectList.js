@@ -53,8 +53,8 @@ export default class ProjectList {
         return newList;
     }
 
-    getTaskList (projectID) {
-        const project = this.getProject(projectID);
+    getTaskList (id) {
+        const project = this.getProject(id);
         const taskList = this.remakeTaskList(project.taskList);
         return taskList;
     }

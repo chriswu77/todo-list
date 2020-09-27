@@ -1,7 +1,4 @@
-
-// export const renderProject = project => {
-
-// };
+import {elements} from './base';
 
 export const renderProject = project => {
     const markup = `
@@ -18,7 +15,7 @@ export const renderProject = project => {
     </div>
     `;
 
-    document.getElementById('project-list').insertAdjacentHTML('beforeend', markup);
+    elements.projectList.insertAdjacentHTML('beforeend', markup);
 };
 
 const renderNumTasks = taskArray => {
@@ -45,13 +42,24 @@ export const renderProjectTasks = (taskArray, projectID) => {
     });
 };
 
+export const isExpanded = projectID => {
+    const dropdownView = document.querySelector(`[data-viewid="${projectID}"]`);
+    if (dropdownView.innerHTML !== '') {
+        return true;
+    } else {
+        return false;
+    }
+};
+
 export const hideTasks = projectID => {
     const dropdownView = document.querySelector(`[data-viewid="${projectID}"]`);
     dropdownView.innerHTML = '';
 };
 
-// hide tasks function
-
 export const renderSavedProjects = projArray => {
     projArray.forEach(proj => renderProject(proj));
+};
+
+export const transformArrow = arrow => {
+    arrow.classList.toggle('rotate');
 };

@@ -1,5 +1,6 @@
 import ProjectList from './ProjectList';
 import * as projectListView from './projectListView';
+import * as projectForm from './projectForm';
 import {elements} from './base';
 
 /** Global state of the app
@@ -38,7 +39,7 @@ window.addEventListener('load', () => {
  * Project List Controller 
  **/
 
-//  expand project to show tasks or minimize
+// expand project to show tasks or minimize
 elements.projectList.addEventListener('click', e => {
     const arrow = e.target.closest('.fa-chevron-right');
     if (arrow) {
@@ -47,20 +48,51 @@ elements.projectList.addEventListener('click', e => {
 
         // addTask (title, description, dueDate, priority, projectName, notes = '', status = true)
         // const taskList = state.projectList.getTaskList(projectID);
-        // console.log(taskList);
         // const task = taskList.addTask('test', 'test', 'test', 'test', 'test', 'test', 'test');
-        // console.log(task);
         // state.projectList.persistData();
 
-        const numTasks = state.projectList.getNumTasks(projectID);
-        console.log(numTasks);
+        // collapse or expand
+        const expanded = projectListView.isExpanded(projectID);
 
-        // check if there are any tasks in the project
-        if (numTasks > 0) {
-            const taskList = state.projectList.getTaskList(projectID);
-            projectListView.renderProjectTasks(taskList.tasks, projectID);
+        if (expanded) {
+            // collapse and hide task
+            projectListView.hideTasks(projectID);
+            projectListView.transformArrow(arrow);
+        } else {
+            // check if there are any tasks in the project before expanding
+            const numTasks = state.projectList.getNumTasks(projectID);
+            console.log(numTasks);
+    
+            if (numTasks > 0) {
+                // render projects and transform the arrow
+                const taskList = state.projectList.getTaskList(projectID);
+                projectListView.renderProjectTasks(taskList.tasks, projectID);
+                projectListView.transformArrow(arrow);
+            }
         }
-
-
     }
 });
+
+// add project button
+elements.addProjectBtn.addEventListener('click', () => {
+    // render form
+    projectForm.renderForm();
+
+    const formDOM = document.getElementById('add-proj-form');
+    formDOM.addEventListener('submit', e => {
+        e.preventDefault();
+        controlProjectForm();
+    });
+
+});
+
+const controlProjectForm = () => {
+    // get input when form submitted
+    const input = projectForm.getInput();
+    // create a new project and render
+    const newProject = state.projectList.addProject(input);
+    projectListView.renderProject(newProject);
+    // exit form
+    projectForm.clearInput();
+    projectForm.exitForm();
+};
