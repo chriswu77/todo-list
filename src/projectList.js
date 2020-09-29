@@ -20,7 +20,7 @@ export default class ProjectList {
     }
 
     removeProject (id) {
-        const index = id;
+        const index = this.projects.findIndex(proj => proj.id === id);
         this.projects.splice(index, 1);
 
         // Persist data in localStorage
@@ -63,5 +63,10 @@ export default class ProjectList {
         const taskList = this.getTaskList(id);
         const numTasks = taskList.getNumTasks();
         return numTasks;
+    }
+
+    getProjectNames () {
+        const projNames = this.projects.map(proj => proj.name);
+        return projNames;
     }
 }

@@ -1,6 +1,7 @@
 import ProjectList from './ProjectList';
 import * as projectListView from './projectListView';
 import * as projectForm from './projectForm';
+import * as taskForm from './taskForm';
 import {elements} from './base';
 
 /** Global state of the app
@@ -37,7 +38,7 @@ window.addEventListener('load', () => {
 
 /**
  * Project List Controller 
- **/
+ */
 
 // expand project to show tasks or minimize
 elements.projectList.addEventListener('click', e => {
@@ -73,26 +74,48 @@ elements.projectList.addEventListener('click', e => {
     }
 });
 
-// add project button
+/**
+ * Add Project Btn Controller
+ */
 elements.addProjectBtn.addEventListener('click', () => {
     // render form
-    projectForm.renderForm();
+    projectForm.renderForm('add');
+    document.addEventListener('keyup', () => projectForm.validateForm());
 
     const formDOM = document.getElementById('add-proj-form');
     formDOM.addEventListener('submit', e => {
         e.preventDefault();
-        controlProjectForm();
+        controlAddProjectForm();
     });
-
 });
 
-const controlProjectForm = () => {
+const controlAddProjectForm = () => {
     // get input when form submitted
     const input = projectForm.getInput();
-    // create a new project and render
-    const newProject = state.projectList.addProject(input);
-    projectListView.renderProject(newProject);
-    // exit form
-    projectForm.clearInput();
-    projectForm.exitForm();
+    if (input) {
+        // create a new project and render
+        const newProject = state.projectList.addProject(input);
+        projectListView.renderProject(newProject);
+        // exit form
+        projectForm.exitForm();
+    }
 };
+
+/**
+ * Add Task Btn Controller
+ */
+elements.addTaskBtn.addEventListener('click', () => {
+    // render form
+    const projNames = state.projectList.getProjectNames();
+    console.log(projNames);
+    taskForm.renderForm('add', state.projectList.getProjectNames());
+
+    // add form validation event listeners
+    const dueDate = document.querySelector('#task-due-date');
+    const priorityListDOM = document.querySelector('#select-priority');
+    const projectListDOM = document.querySelector('#select-project');
+    const inputsArr = [dueDate, priorityListDOM, projectListDOM];
+
+    document.addEventListener('keyup', () => taskForm.validateForm());
+    inputsArr.forEach(input => input.addEventListener('change', taskForm.validateForm));
+});

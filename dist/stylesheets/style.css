@@ -262,6 +262,7 @@ html, body {
 
 .submit-btn {
     margin-left: 15px;
+    opacity: 0.25;
 }
 
 .add-task-form {
