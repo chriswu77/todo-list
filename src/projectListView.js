@@ -7,7 +7,7 @@ export const renderProject = project => {
             <i class="fas fa-chevron-right"></i>
             <div class="click-proj">
                 <div class="shortcut-text proj-name">${project.name}</div>
-                ${renderNumTasks(project.taskList.tasks)}
+                ${renderNumTasks(project.taskList.tasks, project.id)}
             </div>
         </div>
 
@@ -18,15 +18,28 @@ export const renderProject = project => {
     elements.projectList.insertAdjacentHTML('beforeend', markup);
 };
 
-const renderNumTasks = taskArray => {
+const renderNumTasks = (taskArray, id) => {
     const numTasks = taskArray.length;
     let markup = '';
     if (numTasks > 0) {
         markup = `
-            <div class="task-num-style proj-task-num">${numTasks}</div>
+            <div class="task-num-style proj-task-num" data-countid="${id}">${numTasks}</div>
         `;
+    } else {
+        markup = `
+        <div class="task-num-style proj-task-num" data-countid="${id}" style="visibility: hidden;">${numTasks}</div>
+    `;
     }
     return markup;
+};
+
+export const updateNumTasks = (taskArray, id) => {
+    const numTaskDOM = document.querySelector(`[data-countid="${id}"]`);
+    const numTasks = taskArray.length;
+    if (numTasks > 0) {
+        numTaskDOM.textContent = numTasks;
+        numTaskDOM.style.visibility = 'visible';
+    }
 };
 
 export const renderProjectTasks = (taskArray, projectID) => {
@@ -57,6 +70,7 @@ export const hideTasks = projectID => {
 };
 
 export const renderSavedProjects = projArray => {
+    elements.projectList.innerHTML = '';
     projArray.forEach(proj => renderProject(proj));
 };
 

@@ -69,4 +69,9 @@ export default class ProjectList {
         const projNames = this.projects.map(proj => proj.name);
         return projNames;
     }
+
+    getProjectID (projectName) {
+        const index = this.projects.findIndex(proj => proj.name === projectName);
+        return this.projects[index].id;
+    }
 }

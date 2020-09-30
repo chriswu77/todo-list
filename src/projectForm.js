@@ -39,7 +39,7 @@ const getInputHTML = (btn, projectName) => {
 
 export const validateForm = () => {
     const submitBtn = document.querySelector('.submit-btn');
-    const input = document.querySelector('.proj-name-input').value;
+    let input = document.querySelector('.proj-name-input').value;
 
     if (input !== '') {
         //apply active state css

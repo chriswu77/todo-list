@@ -16,7 +16,7 @@ export const exitForm = () => {
     elements.modal.style.visibility = 'hidden';
 };
 
-export const getInput = () => {
+export const getInputs = () => {
     const priorityListDOM = document.querySelector('#select-priority');
     const projectListDOM = document.querySelector('#select-project');
     return {

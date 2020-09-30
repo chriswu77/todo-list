@@ -80,7 +80,8 @@ elements.projectList.addEventListener('click', e => {
 elements.addProjectBtn.addEventListener('click', () => {
     // render form
     projectForm.renderForm('add');
-    document.addEventListener('keyup', () => projectForm.validateForm());
+    // document.addEventListener('keyup', projectForm.validateForm);
+    document.querySelector('.proj-name-input').addEventListener('keyup', projectForm.validateForm);
 
     const formDOM = document.getElementById('add-proj-form');
     formDOM.addEventListener('submit', e => {
@@ -98,6 +99,7 @@ const controlAddProjectForm = () => {
         projectListView.renderProject(newProject);
         // exit form
         projectForm.exitForm();
+        // document.removeEventListener('keyup', projectForm.validateForm);
     }
 };
 
@@ -107,7 +109,6 @@ const controlAddProjectForm = () => {
 elements.addTaskBtn.addEventListener('click', () => {
     // render form
     const projNames = state.projectList.getProjectNames();
-    console.log(projNames);
     taskForm.renderForm('add', state.projectList.getProjectNames());
 
     // add form validation event listeners
@@ -116,6 +117,47 @@ elements.addTaskBtn.addEventListener('click', () => {
     const projectListDOM = document.querySelector('#select-project');
     const inputsArr = [dueDate, priorityListDOM, projectListDOM];
 
-    document.addEventListener('keyup', () => taskForm.validateForm());
+    document.querySelector('#task-title').addEventListener('keyup', taskForm.validateForm);
+    // document.addEventListener('keyup', taskForm.validateForm);
     inputsArr.forEach(input => input.addEventListener('change', taskForm.validateForm));
+
+    // handle data on submit
+    const form = document.querySelector('.add-task-form');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        controlAddTaskForm();
+    });
 });
+
+const controlAddTaskForm = () => {
+    // get data
+    const data = taskForm.getInputs();
+    // create a task in the selected project
+    const projectID = state.projectList.getProjectID(data.project);
+    const taskList = state.projectList.getTaskList(projectID);
+    //addTask (title, description, dueDate, priority, projectName, notes = '', isDone = false)
+    const task = taskList.addTask(data.title, data.description, data.dueDate, data.priority, data.project, data.notes);
+    state.projectList.persistData();
+
+    // render the task in the project list UI
+    // reload the projectList
+    // projectListView.renderSavedProjects(state.projectList.projects);
+    // re-expand the project lists that were expanded before submit
+    expandProjects();
+
+    // exit form
+    taskForm.exitForm();
+    // document.removeEventListener('keyup', taskForm.validateForm);
+};
+
+const expandProjects = () => {
+    state.projectList.projects.forEach(proj => {
+        const taskList = state.projectList.getTaskList(proj.id);
+        const expanded = projectListView.isExpanded(proj.id);
+
+        projectListView.updateNumTasks(taskList.tasks, proj.id);
+        if (expanded) {
+            projectListView.renderProjectTasks(taskList.tasks, proj.id);
+        }
+    });
+};

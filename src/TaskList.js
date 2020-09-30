@@ -6,10 +6,10 @@ export default class TaskList {
         this.tasks = [];
     }
 
-    addTask (title, description, dueDate, priority, projectName, notes = '', status = true) {
+    addTask (title, description, dueDate, priority, projectName, notes = '', isDone = false) {
         const id = uniqid();
 
-        const task = {id, title, description, dueDate, priority, projectName, notes, status};
+        const task = {id, title, description, dueDate, priority, projectName, notes, isDone};
 
         this.tasks.push(task);
         return task;
@@ -24,7 +24,4 @@ export default class TaskList {
         return this.tasks.length;
     }
 
-    test() {
-        console.log('test');
-    }
 }
