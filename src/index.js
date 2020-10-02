@@ -2,6 +2,7 @@ import ProjectList from './ProjectList';
 import * as projectListView from './projectListView';
 import * as projectForm from './projectForm';
 import * as taskForm from './taskForm';
+import * as projectContent from './projectContent';
 import {elements} from './base';
 
 /** Global state of the app
@@ -33,7 +34,6 @@ window.addEventListener('load', () => {
         projectListView.renderSavedProjects(state.projectList.projects);
     }
 
-    // console.log(state.projectList);
 });
 
 /**
@@ -43,36 +43,49 @@ window.addEventListener('load', () => {
 // expand project to show tasks or minimize
 elements.projectList.addEventListener('click', e => {
     const arrow = e.target.closest('.fa-chevron-right');
+    const projectBox = e.target.closest('.click-proj');
     if (arrow) {
-        // get the project id
-        const projectID = arrow.parentElement.parentElement.dataset.projectid;
-
-        // addTask (title, description, dueDate, priority, projectName, notes = '', status = true)
-        // const taskList = state.projectList.getTaskList(projectID);
-        // const task = taskList.addTask('test', 'test', 'test', 'test', 'test', 'test', 'test');
-        // state.projectList.persistData();
-
-        // collapse or expand
-        const expanded = projectListView.isExpanded(projectID);
-
-        if (expanded) {
-            // collapse and hide task
-            projectListView.hideTasks(projectID);
-            projectListView.transformArrow(arrow);
-        } else {
-            // check if there are any tasks in the project before expanding
-            const numTasks = state.projectList.getNumTasks(projectID);
-            console.log(numTasks);
-    
-            if (numTasks > 0) {
-                // render projects and transform the arrow
-                const taskList = state.projectList.getTaskList(projectID);
-                projectListView.renderProjectTasks(taskList.tasks, projectID);
-                projectListView.transformArrow(arrow);
-            }
-        }
+        controlArrow(arrow);
+    } else if (projectBox) {
+        controlBox(projectBox);
     }
 });
+
+const controlArrow = arrow => {
+    // get the project id
+    const projectID = arrow.parentElement.parentElement.dataset.projectid;
+
+    // collapse or expand
+    const expanded = projectListView.isExpanded(projectID);
+
+    if (expanded) {
+        // collapse and hide task
+        projectListView.hideTasks(projectID);
+        projectListView.transformArrow(arrow);
+    } else {
+        // check if there are any tasks in the project before expanding
+        const numTasks = state.projectList.getNumTasks(projectID);
+
+        if (numTasks > 0) {
+            // render projects and transform the arrow
+            const taskList = state.projectList.getTaskList(projectID);
+            projectListView.renderProjectTasks(taskList.tasks, projectID);
+            projectListView.transformArrow(arrow);
+        }
+    }
+};
+
+const controlBox = projectBox => {
+    // get the project
+    const projectID = projectBox.parentElement.parentElement.dataset.projectid;
+    const project = state.projectList.getProject(projectID);
+    const taskList = state.projectList.getTaskList(projectID);
+
+    console.log(project);
+    // render the project data in the content UI
+    projectContent.renderProjectTitle(project.name);
+    projectContent.renderTasks(taskList.tasks);
+};
 
 /**
  * Add Project Btn Controller
@@ -80,7 +93,7 @@ elements.projectList.addEventListener('click', e => {
 elements.addProjectBtn.addEventListener('click', () => {
     // render form
     projectForm.renderForm('add');
-    // document.addEventListener('keyup', projectForm.validateForm);
+
     document.querySelector('.proj-name-input').addEventListener('keyup', projectForm.validateForm);
 
     const formDOM = document.getElementById('add-proj-form');
@@ -99,7 +112,6 @@ const controlAddProjectForm = () => {
         projectListView.renderProject(newProject);
         // exit form
         projectForm.exitForm();
-        // document.removeEventListener('keyup', projectForm.validateForm);
     }
 };
 
@@ -118,7 +130,6 @@ elements.addTaskBtn.addEventListener('click', () => {
     const inputsArr = [dueDate, priorityListDOM, projectListDOM];
 
     document.querySelector('#task-title').addEventListener('keyup', taskForm.validateForm);
-    // document.addEventListener('keyup', taskForm.validateForm);
     inputsArr.forEach(input => input.addEventListener('change', taskForm.validateForm));
 
     // handle data on submit
@@ -139,25 +150,29 @@ const controlAddTaskForm = () => {
     const task = taskList.addTask(data.title, data.description, data.dueDate, data.priority, data.project, data.notes);
     state.projectList.persistData();
 
-    // render the task in the project list UI
-    // reload the projectList
-    // projectListView.renderSavedProjects(state.projectList.projects);
-    // re-expand the project lists that were expanded before submit
-    expandProjects();
+    // update and render the task in the project list UI
+    updateProjects();
 
     // exit form
     taskForm.exitForm();
-    // document.removeEventListener('keyup', taskForm.validateForm);
 };
 
-const expandProjects = () => {
+const updateProjects = () => {
     state.projectList.projects.forEach(proj => {
         const taskList = state.projectList.getTaskList(proj.id);
         const expanded = projectListView.isExpanded(proj.id);
 
+        // update the # of tasks for all projects
         projectListView.updateNumTasks(taskList.tasks, proj.id);
+
+        // re-expand the project's tasks if it was expanded before
         if (expanded) {
             projectListView.renderProjectTasks(taskList.tasks, proj.id);
         }
     });
 };
+
+/**
+ * Project Content Controller
+ */
+

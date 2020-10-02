@@ -145,7 +145,7 @@ html, body {
     margin-right: 10px;
 }
 
-.proj-display-container {
+.main-content-container {
     display: flex;
     flex-direction: column;
 }
