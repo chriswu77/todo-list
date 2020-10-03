@@ -50,3 +50,13 @@ const calculateTime = dueDate => {
         return time
     }
 };
+
+export const clearPage = () => {
+    elements.mainTitle.textContent = '';
+    elements.titleBtns.innerHTML = '';
+    elements.taskList.innerHTML = '';
+};
+
+export const renameProject = newName => {
+    elements.mainTitle.textContent = newName;
+};

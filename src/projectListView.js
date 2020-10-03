@@ -77,3 +77,15 @@ export const renderSavedProjects = projArray => {
 export const transformArrow = arrow => {
     arrow.classList.toggle('rotate');
 };
+
+export const deleteProject = id => {
+    const el = document.querySelector(`[data-projectid="${id}"]`);
+    el.parentElement.removeChild(el);
+};
+
+export const renameProject = (id, newName) => {
+    const parent = document.querySelector(`[data-projectid="${id}"]`);
+    const projectNameDOM = parent.querySelector('.proj-name');
+
+    projectNameDOM.textContent = newName;
+};

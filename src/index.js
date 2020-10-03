@@ -158,6 +158,10 @@ const controlAddTaskForm = () => {
 };
 
 const updateProjects = () => {
+    // elements.projectList.innerHTML = '';
+    // elements.projectList.innerHTML = '';
+    // console.log(elements.projectList.innerHTML);
+
     state.projectList.projects.forEach(proj => {
         const taskList = state.projectList.getTaskList(proj.id);
         const expanded = projectListView.isExpanded(proj.id);
@@ -175,4 +179,56 @@ const updateProjects = () => {
 /**
  * Project Content Controller
  */
+// control project title 
+elements.titleBtns.addEventListener('click', e => {
+    const editBtn = e.target.matches('.proj-edit-btn');
+    const trashBtn = e.target.matches('.proj-trash-btn');
+    let projectID;
 
+    // get projectID
+    const projectName = e.target.parentElement.parentElement.firstElementChild.textContent;
+    if (projectName) {
+        projectID = state.projectList.getProjectID(projectName);
+    }
+
+    // control buttons
+    if (editBtn) {
+        controlEditBtn(projectID, projectName);
+    } else if (trashBtn) {
+        controlTrashBtn(projectID);
+    }
+});
+
+const controlEditBtn = (id, currentName) => {
+    // render the project form
+    projectForm.renderForm('edit', currentName);
+    document.querySelector('.proj-name-input').addEventListener('keyup', projectForm.validateForm);
+    const formDOM = document.getElementById('add-proj-form');
+    formDOM.addEventListener('submit', e => {
+        e.preventDefault();
+        controlEditProjectForm(id);
+    });
+};
+
+const controlEditProjectForm = id => {
+    // get input when form submitted
+    const input = projectForm.getInput();
+    if (input) {
+        // edit the project name
+        state.projectList.renameProject(id, input);
+        // render new name in the title and project list UI
+        projectContent.renameProject(input);
+        projectListView.renameProject(id, input);
+        // exit form
+        projectForm.exitForm();
+    }
+};
+
+const controlTrashBtn = id => {
+    // remove the project from state array
+    state.projectList.removeProject(id);
+    // clear the content page
+    projectContent.clearPage();
+    // update the project list UI
+    projectListView.deleteProject(id);
+};

@@ -74,4 +74,10 @@ export default class ProjectList {
         const index = this.projects.findIndex(proj => proj.name === projectName);
         return this.projects[index].id;
     }
+
+    renameProject (id, newName) {
+        const project = this.getProject(id);
+        project.name = newName;
+        this.persistData();
+    }
 }
