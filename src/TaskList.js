@@ -24,4 +24,18 @@ export default class TaskList {
         return this.tasks.length;
     }
 
+    getTask (id) {
+        const index = this.tasks.findIndex(task => task.id === id);
+        return this.tasks[index];
+    }
+
+    editTask (id, title, description, dueDate, priority, projectName, notes) {
+        const task = this.getTask(id);
+        task.title = title;
+        task.description = description;
+        task.dueDate = dueDate;
+        task.priority = priority;
+        task.projectName = projectName;
+        task.notes = notes;
+    }
 }

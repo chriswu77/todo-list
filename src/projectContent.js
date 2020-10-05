@@ -60,3 +60,21 @@ export const clearPage = () => {
 export const renameProject = newName => {
     elements.mainTitle.textContent = newName;
 };
+
+export const removeTask = taskid => {
+    const el = elements.taskList.querySelector(`[data-taskid="${taskid}"]`);
+    el.parentElement.removeChild(el);
+};
+
+export const editTask = (taskid, title, dueDate) => {
+    const parentElement = elements.taskList.querySelector(`[data-taskid="${taskid}"]`);
+    const titleElement = parentElement.querySelector('.task-name');
+    const dateElement = parentElement.querySelector('.time-remaining');
+
+    if (title) {
+        titleElement.textContent = title;
+    }
+    if (dueDate) {
+        dateElement.textContent = `Due ${calculateTime(dueDate)}`;
+    }
+};
