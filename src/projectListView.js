@@ -36,9 +36,12 @@ const renderNumTasks = (taskArray, id) => {
 export const updateNumTasks = (taskArray, id) => {
     const numTaskDOM = document.querySelector(`[data-countid="${id}"]`);
     const numTasks = taskArray.length;
+
+    numTaskDOM.textContent = numTasks;
     if (numTasks > 0) {
-        numTaskDOM.textContent = numTasks;
         numTaskDOM.style.visibility = 'visible';
+    } else {
+        numTaskDOM.style.visibility = 'hidden';
     }
 };
 
@@ -88,4 +91,10 @@ export const renameProject = (id, newName) => {
     const projectNameDOM = parent.querySelector('.proj-name');
 
     projectNameDOM.textContent = newName;
+};
+
+export const getArrow = projectid => {
+    const parent = document.querySelector(`[data-projectid="${projectid}"]`);
+    const arrow = parent.querySelector('.fa-chevron-right');
+    return arrow;
 };

@@ -142,17 +142,25 @@ const setPriorityHTML = priority => {
 const renderProjectList = (projectNames, currentProject) => {
     let markup;
     if (currentProject === undefined) {
-        markup = `
-        <option value="" hidden disabled selected>Select Project</option>
-        ${getProjNamesHTML(projectNames)}
-        `;
+        const openContentProj = elements.mainTitle.textContent;
+        if (projectNames.includes(openContentProj)) {
+            // set the selected value to current project open in content page if there is one
+            markup = `
+            ${getProjNamesHTML(projectNames, openContentProj)}
+            `;
+        } else {
+            markup = `
+            <option value="" hidden disabled selected>Select Project</option>
+            ${getProjNamesHTML(projectNames)}
+            `;
+        }
     } else {
         markup = `
         ${getProjNamesHTML(projectNames, currentProject)}
         `;
     }
     return markup;
-} ;
+};
 
 const getProjNamesHTML = (projectNames, currentProject) => {
     let markup = '';

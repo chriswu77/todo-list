@@ -120,7 +120,7 @@ const controlAddProjectForm = () => {
 elements.addTaskBtn.addEventListener('click', () => {
     // render form
     const projNames = state.projectList.getProjectNames();
-    taskForm.renderForm('add', state.projectList.getProjectNames());
+    taskForm.renderForm('add', projNames);
 
     // add form validation event listeners
     taskFormEventListeners();
@@ -254,6 +254,10 @@ elements.taskList.addEventListener('click', e => {
 
     if (editBtn) {
         controlEditTaskBtn(taskList, task);
+    } else if (deleteBtn) {
+        controlTaskTrashBtn(taskList, taskID, projectID);
+    } else if (checkBox) {
+        controlCheckBox();
     }
 });
 
@@ -284,12 +288,13 @@ const controlEditTaskForm = (taskList, task) => {
     // render the project's tasks again in content in case task has been re-assigned to different project
     if (data.project !== prevProject) {
         projectContent.removeTask(task.id);
-        moveTask(taskList, task.id)
+        moveTask(taskList, task.id);
+        projectListView.renderSavedProjects(state.projectList.projects);
     } else if (data.title !== prevName || data.dueDate !== prevDueDate) {
         // change the taskDOM name or dueDate
         projectContent.editTask(task.id, data.title, data.dueDate);
+        updateProjects();
     }
-    projectListView.renderSavedProjects(state.projectList.projects);
 
     // exit form
     taskForm.exitForm();
@@ -307,4 +312,23 @@ const moveTask = (taskList, taskid) => {
     state.projectList.persistData();
 };
 
-// set add task form's project value to current project open in content if open
+const controlTaskTrashBtn = (taskList, taskid, projectid) => {
+    // remove the task from the project's task list
+    taskList.removeTask(taskid);
+    state.projectList.persistData();
+    // update the content and project list UIs
+    projectContent.removeTask(taskid);
+    if (taskList.getNumTasks() > 0) {
+        updateProjects();
+    } else {
+        // re-set the project's box UI
+        projectListView.updateNumTasks(taskList.tasks, projectid);
+        projectListView.hideTasks(projectid);
+        const arrow = projectListView.getArrow(projectid);
+        projectListView.transformArrow(arrow);
+    }
+};
+
+const controlCheckBox = () => {
+
+};
