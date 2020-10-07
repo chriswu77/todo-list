@@ -38,4 +38,20 @@ export default class TaskList {
         task.projectName = projectName;
         task.notes = notes;
     }
+
+    changeDoneStatus (id, status) {
+        const task = this.getTask(id);
+        task.isDone = status;
+    }
+
+    moveTaskToEnd (id) {
+        const index = this.tasks.findIndex(task => task.id === id);
+        this.tasks.push(this.tasks.splice(index, 1)[0]);
+    }
+
+    restoreTheTask (id) {
+        const task = this.getTask(id);
+        this.removeTask(id);
+        this.tasks.unshift(task);
+    }
 }

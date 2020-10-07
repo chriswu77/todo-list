@@ -257,9 +257,11 @@ elements.taskList.addEventListener('click', e => {
     } else if (deleteBtn) {
         controlTaskTrashBtn(taskList, taskID, projectID);
     } else if (checkBox) {
-        controlCheckBox();
+        const isChecked = e.target.checked;
+        controlCheckBox(taskList, taskID, isChecked);
     }
 });
+
 
 const controlEditTaskBtn = (taskList, task) => {
     // render the task form
@@ -329,6 +331,20 @@ const controlTaskTrashBtn = (taskList, taskid, projectid) => {
     }
 };
 
-const controlCheckBox = () => {
+const controlCheckBox = (taskList, taskid, isChecked) => {
 
+    // change the task's isDone status
+    taskList.changeDoneStatus(taskid, isChecked);
+    if (isChecked) {
+        // move the task to the bottom of the list / end of the array
+        taskList.moveTaskToEnd(taskid);
+    } else {
+        // move the task to the top
+        taskList.restoreTheTask(taskid);
+    }
+    state.projectList.persistData();
+    // render the task arrays the projectContent and projectList UI
+    projectContent.renderTasks(taskList.tasks);
+    projectContent.toggleCheck(taskid, isChecked);
+    updateProjects();
 };

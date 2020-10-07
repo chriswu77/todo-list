@@ -23,7 +23,7 @@ export const renderTasks = taskArray => {
         const markup = `
         <div class="tasks underline-gray" data-taskid="${task.id}">
             <div class="tasks-left">
-                <input type="checkbox" class="checkbox">
+                <input type="checkbox" class="checkbox" ${persistCheck(task.isDone)}>
                 <p class="task-name shortcut-text">${task.title}</p>
                 <div class="time-remaining">Due ${calculateTime(task.dueDate)}</div>
             </div>
@@ -76,5 +76,22 @@ export const editTask = (taskid, title, dueDate) => {
     }
     if (dueDate) {
         dateElement.textContent = `Due ${calculateTime(dueDate)}`;
+    }
+};
+
+export const toggleCheck = (taskid, isChecked) => {
+    const parentElement = elements.taskList.querySelector(`[data-taskid="${taskid}"]`);
+    const checkBox = parentElement.querySelector('.checkbox');
+
+    if (isChecked) {
+        checkBox.checked = true;
+    } else {
+        checkBox.checked = false;
+    }
+};
+
+const persistCheck = isDone => {
+    if (isDone) {
+        return 'checked'
     }
 };
