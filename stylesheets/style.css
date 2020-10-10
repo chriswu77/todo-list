@@ -194,14 +194,15 @@ html, body {
 }
 
 .checkbox {
-    width: 13px;
+    /* width: 13px;
     height: 13px;
-    margin-right: 10px;
+    margin-right: 10px; */
 }
 
 .time-remaining {
     box-sizing: border-box;
-    color: #528FE3;
+    /* color: #528FE3; */
+    color: #2d2d2d;
     padding: 4px;
     border: 1px solid #2d2d2d;
     border-radius: 3px;
@@ -288,4 +289,22 @@ html, body {
 
 .rotate {
     transform: rotate(90deg);
+}
+
+.finished {
+    text-decoration: line-through;
+    text-decoration-color: grey;
+    color: #808080;
+}
+
+.danger {
+    color: #d9534f;
+}
+
+.warning {
+    color: #f0ad4e;
+}
+
+.primary {
+    color: #428bca;
 }
