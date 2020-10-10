@@ -29,11 +29,18 @@ window.addEventListener('load', () => {
         //if empty, create a default project
         const defaultProject = state.projectList.addProject("Default Project");
         projectListView.renderProject(defaultProject);
+        // render the project data in the content UI
+        projectContent.renderProjectTitle(defaultProject.name);
     } else {
-        // render saved projects
+        // render saved projects in project list
         projectListView.renderSavedProjects(state.projectList.projects);
-    }
 
+        // render first saved project in content
+        const firstProject = state.projectList.projects[0];
+        const taskList = state.projectList.getTaskList(firstProject.id);
+        projectContent.renderProjectTitle(firstProject.name);
+        projectContent.renderTasks(taskList.tasks);
+    }
 });
 
 /**
@@ -250,7 +257,6 @@ elements.taskList.addEventListener('click', e => {
     const projectID = state.projectList.getProjectID(elements.mainTitle.textContent);
     const taskList = state.projectList.getTaskList(projectID);
     const task = taskList.getTask(taskID);
-    console.log(task);
 
     if (editBtn) {
         controlEditTaskBtn(taskList, task);
@@ -258,10 +264,11 @@ elements.taskList.addEventListener('click', e => {
         controlTaskTrashBtn(taskList, taskID, projectID);
     } else if (checkBox) {
         const isChecked = e.target.checked;
-        controlCheckBox(taskList, taskID, isChecked);
+        const taskid = e.target.parentElement.parentElement.parentElement.dataset.taskid;
+
+        controlCheckBox(taskList, taskid, isChecked);
     }
 });
-
 
 const controlEditTaskBtn = (taskList, task) => {
     // render the task form
@@ -284,6 +291,7 @@ const controlEditTaskForm = (taskList, task) => {
     const prevProject = task.projectName;
     const prevName = task.title;
     const prevDueDate = task.dueDate;
+    const prevPriority = task.priority;
     taskList.editTask(task.id, data.title, data.description, data.dueDate, data.priority, data.project, data.notes);
     state.projectList.persistData();
 
@@ -292,9 +300,9 @@ const controlEditTaskForm = (taskList, task) => {
         projectContent.removeTask(task.id);
         moveTask(taskList, task.id);
         projectListView.renderSavedProjects(state.projectList.projects);
-    } else if (data.title !== prevName || data.dueDate !== prevDueDate) {
+    } else if (data.title !== prevName || data.dueDate !== prevDueDate || data.priority !== prevPriority) {
         // change the taskDOM name or dueDate
-        projectContent.editTask(task.id, data.title, data.dueDate);
+        projectContent.editTask(task.id, data.title, data.dueDate, data.priority, task.isDone);
         updateProjects();
     }
 

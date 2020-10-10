@@ -52,10 +52,26 @@ export const renderProjectTasks = (taskArray, projectID) => {
 
     taskArray.forEach(task => {
         const markup = `
-        <div class="proj-items shortcut-text" data-taskid="${task.id}">${task.title}</div>
+        <div class="proj-items shortcut-text ${setTextStyle(task.priority, task.isDone)}" data-taskid="${task.id}">${task.title}</div>
         `;
         dropdownView.insertAdjacentHTML('beforeend', markup);
     });
+};
+
+const setTextStyle = (priority, isDone) => {
+    let markup = '';
+    if (isDone) {
+        markup += 'finished ';
+    }
+
+    if (priority === 'high') {
+        markup += 'danger';
+    } else if (priority === 'medium') {
+        markup += 'warning';
+    } else {
+        markup += 'primary';
+    }
+    return markup;
 };
 
 export const isExpanded = projectID => {

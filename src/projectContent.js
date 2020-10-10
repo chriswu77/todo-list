@@ -15,6 +15,8 @@ export const renderProjectTitle = projectName => {
     `;
 };
 
+{/* <input type="checkbox" class="checkbox" ${persistCheck(task.isDone)}> */}
+
 export const renderTasks = taskArray => {
 
     elements.taskList.innerHTML = '';
@@ -22,10 +24,17 @@ export const renderTasks = taskArray => {
     taskArray.forEach(task => {
         const markup = `
         <div class="tasks underline-gray" data-taskid="${task.id}">
-            <div class="tasks-left">
-                <input type="checkbox" class="checkbox" ${persistCheck(task.isDone)}>
-                <p class="task-name shortcut-text">${task.title}</p>
-                <div class="time-remaining">Due ${calculateTime(task.dueDate)}</div>
+            <div class="tasks-left ${persistLine(task.isDone)}">
+
+                <div class="pretty p-default p-round">
+                    <input type="checkbox" class="checkbox" ${persistCheck(task.isDone)}>
+                    <div class="state ${setCheckBoxColor(task.priority)}">
+                        <label></label>
+                    </div>
+                </div>
+
+                <p class="task-name shortcut-text ${setFontColor(task.priority)}">${task.title}</p>
+                <div class="time-remaining ${persistLine(task.isDone)}">Due ${calculateTime(task.dueDate)}</div>
             </div>
             <div class="tasks-right">
                 <i class="far fa-edit task-edit-btn"></i>
@@ -66,10 +75,11 @@ export const removeTask = taskid => {
     el.parentElement.removeChild(el);
 };
 
-export const editTask = (taskid, title, dueDate) => {
+export const editTask = (taskid, title, dueDate, priority, isDone) => {
     const parentElement = elements.taskList.querySelector(`[data-taskid="${taskid}"]`);
     const titleElement = parentElement.querySelector('.task-name');
     const dateElement = parentElement.querySelector('.time-remaining');
+    const checkBoxColor = parentElement.querySelector('.state');
 
     if (title) {
         titleElement.textContent = title;
@@ -77,16 +87,44 @@ export const editTask = (taskid, title, dueDate) => {
     if (dueDate) {
         dateElement.textContent = `Due ${calculateTime(dueDate)}`;
     }
+    if (priority) {
+        titleElement.classList.remove('danger');
+        titleElement.classList.remove('warning');
+        titleElement.classList.remove('primary');
+
+        if (priority === 'high') {
+            titleElement.classList.add('danger');
+        } else if (priority === 'medium') {
+            titleElement.classList.add('warning');
+        } else {
+            titleElement.classList.add('primary');
+        }
+
+        if (isDone) {
+            const color = setCheckBoxColor(priority);
+            checkBoxColor.classList.remove('p-danger-o');
+            checkBoxColor.classList.remove('p-warning-o');
+            checkBoxColor.classList.remove('p-primary-o');
+
+            checkBoxColor.classList.add(color);
+        }
+    }
 };
 
 export const toggleCheck = (taskid, isChecked) => {
     const parentElement = elements.taskList.querySelector(`[data-taskid="${taskid}"]`);
     const checkBox = parentElement.querySelector('.checkbox');
+    const tasksLeft = parentElement.querySelector('.tasks-left');
+    const time = parentElement.querySelector('.time-remaining');
 
     if (isChecked) {
         checkBox.checked = true;
+        tasksLeft.classList.add('finished');
+        time.classList.add('finished');
     } else {
         checkBox.checked = false;
+        tasksLeft.classList.remove('finished');
+        time.classList.remove('finished');
     }
 };
 
@@ -94,4 +132,34 @@ const persistCheck = isDone => {
     if (isDone) {
         return 'checked'
     }
+};
+
+const persistLine = isDone => {
+    if (isDone) {
+        return 'finished'
+    }
+};
+
+const setCheckBoxColor = priority => {
+    let markup;
+    if (priority === 'high') {
+        markup = 'p-danger-o';
+    } else if (priority === 'medium') {
+        markup = 'p-warning-o';
+    } else {
+        markup = 'p-primary-o';
+    }
+    return markup;
+};
+
+const setFontColor = priority => {
+    let markup;
+    if (priority === 'high') {
+        markup = 'danger';
+    } else if (priority === 'medium') {
+        markup = 'warning';
+    } else {
+        markup = 'primary';
+    }
+    return markup;
 };

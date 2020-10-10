@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "date-fns": "^2.16.1",
+    "pretty-checkbox": "^3.0.3",
     "uniqid": "^5.2.0"
   }
 }
