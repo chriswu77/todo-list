@@ -3,7 +3,6 @@ import isToday from 'date-fns/isToday';
 import isTomorrow from 'date-fns/isTomorrow';
 import isYesterday from 'date-fns/isYesterday';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import isThisWeek from 'date-fns/isThisWeek';
 
 export const renderProjectTitle = projectName => {
     elements.titleBtns.innerHTML = '';
@@ -15,15 +14,13 @@ export const renderProjectTitle = projectName => {
     `;
 };
 
-{/* <input type="checkbox" class="checkbox" ${persistCheck(task.isDone)}> */}
-
-export const renderTasks = taskArray => {
+export const renderTasks = (taskArray, shortcut) => {
 
     elements.taskList.innerHTML = '';
 
     taskArray.forEach(task => {
         const markup = `
-        <div class="tasks underline-gray" data-taskid="${task.id}">
+        <div class="tasks underline-gray" data-taskid="${task.id}" data-projectname="${task.projectName}">
             <div class="tasks-left ${persistLine(task.isDone)}">
 
                 <div class="pretty p-default p-round">
@@ -37,6 +34,7 @@ export const renderTasks = taskArray => {
                 <div class="time-remaining ${persistLine(task.isDone)}">Due ${calculateTime(task.dueDate)}</div>
             </div>
             <div class="tasks-right">
+                ${renderProjectName(shortcut, task.projectName)}
                 <i class="far fa-edit task-edit-btn"></i>
                 <i class="far fa-trash-alt task-trash-btn"></i>
             </div>
@@ -45,6 +43,14 @@ export const renderTasks = taskArray => {
           
         elements.taskList.insertAdjacentHTML('beforeend', markup);
     });
+};
+
+const renderProjectName = (shortcut, name) => {
+    let markup = '';
+    if (shortcut) {
+        markup = `<p class="task-proj-name">${name}</p>`;
+    }
+    return markup;
 };
 
 const calculateTime = dueDate => {
@@ -126,6 +132,14 @@ export const toggleCheck = (taskid, isChecked) => {
         tasksLeft.classList.remove('finished');
         time.classList.remove('finished');
     }
+};
+
+export const getListOrder = () => {
+    const tasks = Array.from(elements.taskList.querySelectorAll('.tasks'));
+    const ids = tasks.map(task => task.dataset.taskid);
+    return ids;
+    // console.log(ids);
+    // console.log(tasks);
 };
 
 const persistCheck = isDone => {

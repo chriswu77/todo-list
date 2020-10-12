@@ -186,6 +186,7 @@ html, body {
     align-items: center;
     justify-content: space-between;
     padding-top: 20px;
+    cursor: pointer;
 }
 
 .tasks-left, .tasks-right {
@@ -307,4 +308,11 @@ html, body {
 
 .primary {
     color: #428bca;
+}
+
+.task-proj-name {
+    font-size: 14px;
+    color: #2d2d2d;
+    margin-right: 20px;  
+    align-self: flex-end;
 }

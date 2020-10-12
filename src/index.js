@@ -4,6 +4,10 @@ import * as projectForm from './projectForm';
 import * as taskForm from './taskForm';
 import * as projectContent from './projectContent';
 import {elements} from './base';
+import Sortable from "sortablejs";
+import * as shortcuts from './shortcuts';
+import * as shortcutsView from './shortcutsUI';
+// import { MultiDrag, Swap, OnSpill, AutoScroll } from "sortablejs";
 
 /** Global state of the app
  * - Project list
@@ -19,6 +23,14 @@ const state = {};
 window.addEventListener('load', () => {
 
     if (!state.projectList) state.projectList = new ProjectList();
+
+    if (!state.moveableTaskList) state.moveableTaskList = new Sortable(elements.taskList, {
+        animation: 200,
+        filter: '.finished',
+        onUpdate: function (/**Event*/ evt) {
+            updateTasks();
+          }
+    });
 
     // check if storage has any projects
     state.projectList.readStorage();
@@ -88,7 +100,6 @@ const controlBox = projectBox => {
     const project = state.projectList.getProject(projectID);
     const taskList = state.projectList.getTaskList(projectID);
 
-    console.log(project);
     // render the project data in the content UI
     projectContent.renderProjectTitle(project.name);
     projectContent.renderTasks(taskList.tasks);
@@ -253,22 +264,46 @@ elements.taskList.addEventListener('click', e => {
     const deleteBtn = e.target.matches('.task-trash-btn');
     const checkBox = e.target.matches('.checkbox');
 
-    const taskID = e.target.parentElement.parentElement.dataset.taskid;
-    const projectID = state.projectList.getProjectID(elements.mainTitle.textContent);
-    const taskList = state.projectList.getTaskList(projectID);
-    const task = taskList.getTask(taskID);
+    // const taskID = e.target.parentElement.parentElement.dataset.taskid;
+    // const projName = e.target.parentElement.parentElement.dataset.projectname;
+    // const projectID = state.projectList.getProjectID(projName);
+    // const taskList = state.projectList.getTaskList(projectID);
+    // const task = taskList.getTask(taskID);
 
     if (editBtn) {
-        controlEditTaskBtn(taskList, task);
+        const data = clickInfo(e, false);
+        controlEditTaskBtn(data.taskList, data.task);
     } else if (deleteBtn) {
-        controlTaskTrashBtn(taskList, taskID, projectID);
+        const data = clickInfo(e, false)
+        controlTaskTrashBtn(data.taskList, data.taskID, data.projectID);
     } else if (checkBox) {
         const isChecked = e.target.checked;
-        const taskid = e.target.parentElement.parentElement.parentElement.dataset.taskid;
-
-        controlCheckBox(taskList, taskid, isChecked);
+        const data = clickInfo(e, true);
+        // const taskid = e.target.parentElement.parentElement.parentElement.dataset.taskid;
+        controlCheckBox(data.taskList, data.taskid, isChecked);
     }
 });
+
+const clickInfo = (e, checked) => {
+    if (!checked) {
+        const taskID = e.target.parentElement.parentElement.dataset.taskid;
+        const projName = e.target.parentElement.parentElement.dataset.projectname;
+        const projectID = state.projectList.getProjectID(projName);
+        const taskList = state.projectList.getTaskList(projectID);
+        const task = taskList.getTask(taskID);
+        return {
+            taskID, projectID, taskList, task
+        }
+    } else {
+        const taskid = e.target.parentElement.parentElement.parentElement.dataset.taskid;
+        const projName = e.target.parentElement.parentElement.parentElement.dataset.projectname;
+        const projectID = state.projectList.getProjectID(projName);
+        const taskList = state.projectList.getTaskList(projectID);
+        return {
+            taskList, taskid
+        }
+    }
+};
 
 const controlEditTaskBtn = (taskList, task) => {
     // render the task form
@@ -340,7 +375,6 @@ const controlTaskTrashBtn = (taskList, taskid, projectid) => {
 };
 
 const controlCheckBox = (taskList, taskid, isChecked) => {
-
     // change the task's isDone status
     taskList.changeDoneStatus(taskid, isChecked);
     if (isChecked) {
@@ -351,8 +385,58 @@ const controlCheckBox = (taskList, taskid, isChecked) => {
         taskList.restoreTheTask(taskid);
     }
     state.projectList.persistData();
-    // render the task arrays the projectContent and projectList UI
-    projectContent.renderTasks(taskList.tasks);
+    // render the task arrays in the projectContent and projectList UI
+    const title = elements.mainTitle.textContent;
+    console.log(title);
+    // if (title !== 'Today' || title !== 'Next 7 Days') {
+    //     projectContent.renderTasks(taskList.tasks);
+    // } else {
+    //     let arr;
+    //     if (title === 'Today') {
+    //         arr = shortcuts.getTodayTasks(state.projectList);
+    //         console.log(arr);
+    //     } else if (title === 'Next 7 Days') {
+
+    //     }
+    //     projectContent.renderTasks(arr, true);
+    // }
+    if (title === 'Today') {
+        const arr = shortcuts.getTodayTasks(state.projectList);
+        projectContent.renderTasks(arr, true);
+        console.log(arr);
+    } else if (title === 'Next 7 Days') {
+
+    } else {
+        projectContent.renderTasks(taskList.tasks);
+    }
     projectContent.toggleCheck(taskid, isChecked);
     updateProjects();
 };
+
+/**
+ * Control the sortable JS library
+ */
+const updateTasks = () => {
+    if (elements.mainTitle.textContent !== 'Today' || elements.mainTitle.textContent !== 'Next 7 Days') {
+    // get the task index order from the taskList DOM
+    const taskids = projectContent.getListOrder();
+    // update the task array to match that order
+    const projectID = state.projectList.getProjectID(elements.mainTitle.textContent);
+    const taskList = state.projectList.getTaskList(projectID);
+    taskList.rearrangeTasks(taskids);
+    state.projectList.persistData();
+    // update the project list UI 
+    updateProjects();
+    }
+};
+
+/**
+ * Shortcuts controller
+ */
+elements.todayShortcut.addEventListener('click', () => {
+    // get the tasks for today
+    const tasksArr = shortcuts.getTodayTasks(state.projectList);
+    // show it in the main content UI
+    shortcutsView.renderTitle('today');
+    projectContent.renderTasks(tasksArr, true);
+});

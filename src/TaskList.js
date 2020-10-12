@@ -1,4 +1,5 @@
 import uniqid from 'uniqid';
+import isToday from 'date-fns/isToday';
 
 export default class TaskList {
 
@@ -53,5 +54,30 @@ export default class TaskList {
         const task = this.getTask(id);
         this.removeTask(id);
         this.tasks.unshift(task);
+    }
+
+    rearrangeTasks (idArr) {
+        // copy the tasks array
+        const copy = [...this.tasks];
+        // set the tasks to empty
+        this.tasks.length = 0;
+        //push in the tasks under the new order
+        idArr.forEach(id => {
+            // get the task from the copy
+            const index = copy.findIndex(task => task.id === id);
+            const task = copy[index];
+            // insert the task into the array
+            this.tasks.push(task);
+        });
+    }
+
+    getTodayTasks () {
+        const todayArr = [];
+        this.tasks.forEach(task => {
+            if(isToday(new Date(task.dueDate))) {
+                todayArr.push(task);
+            }
+        });
+        return todayArr;
     }
 }
