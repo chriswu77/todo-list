@@ -9,5 +9,7 @@ export const elements = {
     titleBtns: document.querySelector('.edit-btns'),
     taskList: document.querySelector('.task-list-container'),
     todayShortcut: document.querySelector('#today-container'),
-    weekShortcut: document.querySelector('#week-container')
+    weekShortcut: document.querySelector('#week-container'),
+    todayCount: document.getElementById('today-task-num'),
+    weekCount: document.getElementById('week-task-num')
 };

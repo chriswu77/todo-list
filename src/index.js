@@ -52,6 +52,9 @@ window.addEventListener('load', () => {
         const taskList = state.projectList.getTaskList(firstProject.id);
         projectContent.renderProjectTitle(firstProject.name);
         projectContent.renderTasks(taskList.tasks);
+
+        // render the number of tasks in shortcuts UI
+
     }
 });
 
@@ -435,8 +438,14 @@ const updateTasks = () => {
  */
 elements.todayShortcut.addEventListener('click', () => {
     // get the tasks for today
-    const tasksArr = shortcuts.getTodayTasks(state.projectList);
+    const tasksArr = shortcuts.getTasks(state.projectList, 'today');
     // show it in the main content UI
     shortcutsView.renderTitle('today');
     projectContent.renderTasks(tasksArr, true);
+});
+
+elements.weekShortcut.addEventListener('click', () => {
+    // get the tasks for the next week
+    const weekTasks = shortcuts.getTasks(state.projectList, 'week');
+    console.log(weekTasks);
 });

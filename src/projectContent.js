@@ -3,6 +3,7 @@ import isToday from 'date-fns/isToday';
 import isTomorrow from 'date-fns/isTomorrow';
 import isYesterday from 'date-fns/isYesterday';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import addMinutes from 'date-fns/addMinutes'
 
 export const renderProjectTitle = projectName => {
     elements.titleBtns.innerHTML = '';
@@ -54,14 +55,19 @@ const renderProjectName = (shortcut, name) => {
 };
 
 const calculateTime = dueDate => {
-    if (isToday(new Date(dueDate))) {
+
+    const oldDate = new Date(dueDate);
+    const offset = new Date().getTimezoneOffset(); // 420 minutes / 7 hrs
+    const newDate = addMinutes(oldDate, offset);
+
+    if (isToday(newDate)) {
         return 'Today'
-    } else if (isTomorrow(new Date(dueDate))) {
+    } else if (isTomorrow(newDate)) {
         return 'Tomorrow'
-    } else if (isYesterday(new Date(dueDate))) {
+    } else if (isYesterday(newDate)) {
         return 'Yesterday'
     } else {
-        const time = formatDistanceToNow(new Date(dueDate), {addSuffix: true});
+        const time = formatDistanceToNow(newDate, {addSuffix: true});
         return time
     }
 };

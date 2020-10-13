@@ -1,5 +1,8 @@
 import uniqid from 'uniqid';
 import isToday from 'date-fns/isToday';
+import addDays from 'date-fns/addDays';
+import isWithinInterval from 'date-fns/isWithinInterval';
+import addMinutes from 'date-fns/addMinutes'
 
 export default class TaskList {
 
@@ -73,11 +76,36 @@ export default class TaskList {
 
     getTodayTasks () {
         const todayArr = [];
+        const offset = new Date().getTimezoneOffset(); 
+
         this.tasks.forEach(task => {
-            if(isToday(new Date(task.dueDate))) {
+            let dueDatev2 = new Date(task.dueDate);
+            dueDatev2 = addMinutes(dueDatev2, offset);
+            if(isToday(dueDatev2)) {
                 todayArr.push(task);
             }
         });
         return todayArr;
+    }
+
+    getWeekTasks () {
+        const today = new Date();
+        const offset = today.getTimezoneOffset(); 
+        const endOfWeek = addDays(today, 7);
+        const ansArr = [];
+
+        this.tasks.forEach(task => {
+            let dueDatev2 = new Date(task.dueDate);
+            dueDatev2 = addMinutes(dueDatev2, offset);
+            // is the dueDate within the next 7 days?
+            if (isWithinInterval(dueDatev2, {
+                start: today,
+                end: endOfWeek
+            })) {
+                ansArr.push(task);
+            }
+        });
+
+        return ansArr;
     }
 }
