@@ -43,20 +43,26 @@ window.addEventListener('load', () => {
         projectListView.renderProject(defaultProject);
         // render the project data in the content UI
         projectContent.renderProjectTitle(defaultProject.name);
+        // edit today shortcuts
+        shortcutsView.renderNumTasks(0,0);
     } else {
         // render saved projects in project list
         projectListView.renderSavedProjects(state.projectList.projects);
-
         // render first saved project in content
         const firstProject = state.projectList.projects[0];
         const taskList = state.projectList.getTaskList(firstProject.id);
         projectContent.renderProjectTitle(firstProject.name);
         projectContent.renderTasks(taskList.tasks);
-
         // render the number of tasks in shortcuts UI
-
+        updateShortcuts();
     }
 });
+
+const updateShortcuts = () => {
+    const todayCount = shortcuts.getTaskCount(state.projectList, 'today');
+    const weekCount = shortcuts.getTaskCount(state.projectList, 'week');
+    shortcutsView.renderNumTasks(todayCount, weekCount);
+};
 
 /**
  * Project List Controller 
@@ -171,7 +177,7 @@ const controlAddTaskForm = () => {
     const projectID = state.projectList.getProjectID(data.project);
     const taskList = state.projectList.getTaskList(projectID);
     //addTask (title, description, dueDate, priority, projectName, notes = '', isDone = false)
-    const task = taskList.addTask(data.title, data.description, data.dueDate, data.priority, data.project, data.notes);
+    const task = taskList.addTask(null, data.title, data.description, data.dueDate, data.priority, data.project, data.notes);
     state.projectList.persistData();
 
     // update and render the task in the project list UI
@@ -179,6 +185,9 @@ const controlAddTaskForm = () => {
 
     // add the task in content container if task belongs in the current open one
     updateContent(taskList, task);
+
+    // update shortcuts numbers
+    updateShortcuts();
 
     // exit form
     taskForm.exitForm();
@@ -200,8 +209,19 @@ const updateProjects = () => {
 };
 
 const updateContent = (taskList, task) => {
-    if (elements.mainTitle.textContent === task.projectName) {
+    const title = elements.mainTitle.textContent;
+    if (title === task.projectName) {
         projectContent.renderTasks(taskList.tasks);
+    } else if (title === 'Today') {
+        if (taskList.isDueToday(task.dueDate)) {
+            const tasksArr = taskList.getTodayTasks();
+            projectContent.renderTasks(tasksArr, true);
+        }
+    } else if (title === 'Next 7 Days') {
+        if (taskList.isDueThisWeek(task.dueDate)) {
+            const tasksArr = taskList.getWeekTasks();
+            projectContent.renderTasks(tasksArr, true);
+        }
     }
 };
 
@@ -267,12 +287,6 @@ elements.taskList.addEventListener('click', e => {
     const deleteBtn = e.target.matches('.task-trash-btn');
     const checkBox = e.target.matches('.checkbox');
 
-    // const taskID = e.target.parentElement.parentElement.dataset.taskid;
-    // const projName = e.target.parentElement.parentElement.dataset.projectname;
-    // const projectID = state.projectList.getProjectID(projName);
-    // const taskList = state.projectList.getTaskList(projectID);
-    // const task = taskList.getTask(taskID);
-
     if (editBtn) {
         const data = clickInfo(e, false);
         controlEditTaskBtn(data.taskList, data.task);
@@ -282,7 +296,6 @@ elements.taskList.addEventListener('click', e => {
     } else if (checkBox) {
         const isChecked = e.target.checked;
         const data = clickInfo(e, true);
-        // const taskid = e.target.parentElement.parentElement.parentElement.dataset.taskid;
         controlCheckBox(data.taskList, data.taskid, isChecked);
     }
 });
@@ -335,7 +348,14 @@ const controlEditTaskForm = (taskList, task) => {
 
     // render the project's tasks again in content in case task has been re-assigned to different project
     if (data.project !== prevProject) {
-        projectContent.removeTask(task.id);
+        const title = elements.mainTitle.textContent;
+        if (title === 'Today' || title === 'Next 7 Days') {
+            // only update the project name description
+            shortcutsView.updateProjectInfo(task.id, data.project);
+        } else {
+            // remove the task from the project view if not shortcuts
+            projectContent.removeTask(task.id);
+        }
         moveTask(taskList, task.id);
         projectListView.renderSavedProjects(state.projectList.projects);
     } else if (data.title !== prevName || data.dueDate !== prevDueDate || data.priority !== prevPriority) {
@@ -343,6 +363,9 @@ const controlEditTaskForm = (taskList, task) => {
         projectContent.editTask(task.id, data.title, data.dueDate, data.priority, task.isDone);
         updateProjects();
     }
+
+    // update shortcuts
+    updateShortcuts();
 
     // exit form
     taskForm.exitForm();
@@ -356,7 +379,7 @@ const moveTask = (taskList, taskid) => {
     const newProjectID = state.projectList.getProjectID(newTask.projectName);
     const newTaskList = state.projectList.getTaskList(newProjectID);
     // addTask (title, description, dueDate, priority, projectName, notes = '', isDone = false)
-    newTaskList.addTask(newTask.title, newTask.description, newTask.dueDate, newTask.priority, newTask.projectName, newTask.notes, newTask.isDone);
+    newTaskList.addTask(newTask.id, newTask.title, newTask.description, newTask.dueDate, newTask.priority, newTask.projectName, newTask.notes, newTask.isDone);
     state.projectList.persistData();
 };
 
@@ -375,6 +398,9 @@ const controlTaskTrashBtn = (taskList, taskid, projectid) => {
         const arrow = projectListView.getArrow(projectid);
         projectListView.transformArrow(arrow);
     }
+
+    // update shortcuts
+    updateShortcuts();
 };
 
 const controlCheckBox = (taskList, taskid, isChecked) => {
@@ -390,25 +416,13 @@ const controlCheckBox = (taskList, taskid, isChecked) => {
     state.projectList.persistData();
     // render the task arrays in the projectContent and projectList UI
     const title = elements.mainTitle.textContent;
-    console.log(title);
-    // if (title !== 'Today' || title !== 'Next 7 Days') {
-    //     projectContent.renderTasks(taskList.tasks);
-    // } else {
-    //     let arr;
-    //     if (title === 'Today') {
-    //         arr = shortcuts.getTodayTasks(state.projectList);
-    //         console.log(arr);
-    //     } else if (title === 'Next 7 Days') {
 
-    //     }
-    //     projectContent.renderTasks(arr, true);
-    // }
     if (title === 'Today') {
-        const arr = shortcuts.getTodayTasks(state.projectList);
+        const arr = shortcuts.getTasks(state.projectList, 'today');
         projectContent.renderTasks(arr, true);
-        console.log(arr);
     } else if (title === 'Next 7 Days') {
-
+        const arr = shortcuts.getTasks(state.projectList, 'week');
+        projectContent.renderTasks(arr, true);
     } else {
         projectContent.renderTasks(taskList.tasks);
     }
@@ -447,5 +461,7 @@ elements.todayShortcut.addEventListener('click', () => {
 elements.weekShortcut.addEventListener('click', () => {
     // get the tasks for the next week
     const weekTasks = shortcuts.getTasks(state.projectList, 'week');
-    console.log(weekTasks);
+    // show it in the main content UI
+    shortcutsView.renderTitle('week');
+    projectContent.renderTasks(weekTasks, true);
 });

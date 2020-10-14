@@ -10,8 +10,10 @@ export default class TaskList {
         this.tasks = [];
     }
 
-    addTask (title, description, dueDate, priority, projectName, notes = '', isDone = false) {
-        const id = uniqid();
+    addTask (id, title, description, dueDate, priority, projectName, notes = '', isDone = false) {
+        if (id === null) {
+            id = uniqid();
+        }
 
         const task = {id, title, description, dueDate, priority, projectName, notes, isDone};
 
@@ -107,5 +109,28 @@ export default class TaskList {
         });
 
         return ansArr;
+    }
+
+    isDueToday (dueDate) {
+        const offset = new Date().getTimezoneOffset(); 
+        dueDate = new Date(dueDate);
+        dueDate = addMinutes(dueDate, offset);
+        return isToday(dueDate);
+    }
+
+    isDueThisWeek (dueDate) {
+        const today = new Date();
+        const offset = today.getTimezoneOffset(); 
+        const endOfWeek = addDays(today, 7);
+
+        dueDate = new Date(dueDate);
+        dueDate = addMinutes(dueDate, offset);
+
+        const ans = isWithinInterval(dueDate, {
+            start: today,
+            end: endOfWeek
+        });
+
+        return ans;
     }
 }

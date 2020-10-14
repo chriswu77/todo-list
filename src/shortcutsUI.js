@@ -25,3 +25,11 @@ export const renderNumTasks = (todayCount, weekCount) => {
         elements.weekCount.style.visibility = 'hidden';
     }
 };
+
+export const updateProjectInfo = (taskid, name) => {
+    const parentElement = elements.taskList.querySelector(`[data-taskid="${taskid}"]`);
+    parentElement.dataset.projectname = name;
+
+    const projectName = parentElement.querySelector('.task-proj-name');
+    projectName.textContent = name;
+};
