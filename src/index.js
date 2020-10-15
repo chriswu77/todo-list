@@ -1,4 +1,6 @@
 import ProjectList from './ProjectList';
+import TodayOrder from './todayOrder';
+import WeekOrder from './weekOrder';
 import * as projectListView from './projectListView';
 import * as projectForm from './projectForm';
 import * as taskForm from './taskForm';
@@ -23,14 +25,20 @@ const state = {};
 window.addEventListener('load', () => {
 
     if (!state.projectList) state.projectList = new ProjectList();
+    if (!state.todayOrder) state.todayOrder = new TodayOrder();
+    if (!state.weekOrder) state.weekOrder = new WeekOrder();
 
     if (!state.moveableTaskList) state.moveableTaskList = new Sortable(elements.taskList, {
         animation: 200,
-        filter: '.finished',
+        filter: '.done',
         onUpdate: function (/**Event*/ evt) {
             updateTasks();
           }
     });
+
+    // read in the today and week shortcuts saved task order
+    state.todayOrder.readStorage();
+    state.weekOrder.readStorage();
 
     // check if storage has any projects
     state.projectList.readStorage();
@@ -180,13 +188,16 @@ const controlAddTaskForm = () => {
     const task = taskList.addTask(null, data.title, data.description, data.dueDate, data.priority, data.project, data.notes);
     state.projectList.persistData();
 
+    // add Task to the shortcuts order data if due Today or next 7 days
+    addToShortcutsOrder(taskList, task);
+
     // update and render the task in the project list UI
     updateProjects();
 
     // add the task in content container if task belongs in the current open one
     updateContent(taskList, task);
 
-    // update shortcuts numbers
+    // update shortcuts number of tasks
     updateShortcuts();
 
     // exit form
@@ -212,16 +223,24 @@ const updateContent = (taskList, task) => {
     const title = elements.mainTitle.textContent;
     if (title === task.projectName) {
         projectContent.renderTasks(taskList.tasks);
-    } else if (title === 'Today') {
-        if (taskList.isDueToday(task.dueDate)) {
-            const tasksArr = taskList.getTodayTasks();
-            projectContent.renderTasks(tasksArr, true);
-        }
-    } else if (title === 'Next 7 Days') {
-        if (taskList.isDueThisWeek(task.dueDate)) {
-            const tasksArr = taskList.getWeekTasks();
-            projectContent.renderTasks(tasksArr, true);
-        }
+    } else if (title === 'Today' && taskList.isDueToday(task.dueDate)) {
+        // let tasksArr = shortcuts.getTasks(state.projectList, 'today');
+        // tasksArr = state.todayOrder.rearrangeTasks(tasksArr);
+        // projectContent.renderTasks(tasksArr, true);
+        renderShortcutsContent('today');
+    } else if (title === 'Next 7 Days' && taskList.isDueThisWeek(task.dueDate)) {
+        // let tasksArr = shortcuts.getTasks(state.projectList, 'week');
+        // tasksArr = state.weekOrder.rearrangeTasks(tasksArr);
+        // projectContent.renderTasks(tasksArr, true);
+        renderShortcutsContent('week');
+    }
+};
+
+const addToShortcutsOrder = (taskList, task) => {
+    if (taskList.isDueToday(task.dueDate)) {
+        state.todayOrder.addTask(task.id);
+    } else if (taskList.isDueThisWeek(task.dueDate)) {
+        state.weekOrder.addTask(task.id);
     }
 };
 
@@ -384,9 +403,13 @@ const moveTask = (taskList, taskid) => {
 };
 
 const controlTaskTrashBtn = (taskList, taskid, projectid) => {
+    // remove from the shortcuts order data
+    removeShortcutsOrder(taskList, taskid);
+
     // remove the task from the project's task list
     taskList.removeTask(taskid);
     state.projectList.persistData();
+
     // update the content and project list UIs
     projectContent.removeTask(taskid);
     if (taskList.getNumTasks() > 0) {
@@ -398,31 +421,55 @@ const controlTaskTrashBtn = (taskList, taskid, projectid) => {
         const arrow = projectListView.getArrow(projectid);
         projectListView.transformArrow(arrow);
     }
-
-    // update shortcuts
+    // update shortcuts task num
     updateShortcuts();
 };
 
+const removeShortcutsOrder = (taskList, taskid) => {
+    const date = taskList.getTask(taskid).dueDate;
+
+    if (taskList.isDueToday(date)) {
+        state.todayOrder.removeTask(taskid);
+    } else if (taskList.isDueThisWeek(date)) {
+        state.weekOrder.removeTask(taskid);
+    }
+};
+
 const controlCheckBox = (taskList, taskid, isChecked) => {
+    const title = elements.mainTitle.textContent;
+
     // change the task's isDone status
     taskList.changeDoneStatus(taskid, isChecked);
     if (isChecked) {
         // move the task to the bottom of the list / end of the array
         taskList.moveTaskToEnd(taskid);
+
+        if (title === 'Today') {
+            state.todayOrder.moveTaskToEnd(taskid);
+        } else if (title === 'Next 7 Days') {
+            state.weekOrder.moveTaskToEnd(taskid);
+        }
     } else {
         // move the task to the top
         taskList.restoreTheTask(taskid);
-    }
-    state.projectList.persistData();
-    // render the task arrays in the projectContent and projectList UI
-    const title = elements.mainTitle.textContent;
 
+        if (title === 'Today') {
+            state.todayOrder.restoreTask(taskid);
+        } else if (title === 'Next 7 Days') {
+            state.weekOrder.restoreTask(taskid);
+        }
+    }
+
+    state.projectList.persistData();
+
+    // render the task arrays in the projectContent and projectList UI
     if (title === 'Today') {
-        const arr = shortcuts.getTasks(state.projectList, 'today');
-        projectContent.renderTasks(arr, true);
+        renderShortcutsContent('today');
     } else if (title === 'Next 7 Days') {
-        const arr = shortcuts.getTasks(state.projectList, 'week');
-        projectContent.renderTasks(arr, true);
+        // let arr = shortcuts.getTasks(state.projectList, 'week');
+        // arr = state.weekOrder.rearrangeTasks(arr);
+        // projectContent.renderTasks(arr, true);
+        renderShortcutsContent('week');
     } else {
         projectContent.renderTasks(taskList.tasks);
     }
@@ -434,16 +481,21 @@ const controlCheckBox = (taskList, taskid, isChecked) => {
  * Control the sortable JS library
  */
 const updateTasks = () => {
-    if (elements.mainTitle.textContent !== 'Today' || elements.mainTitle.textContent !== 'Next 7 Days') {
-    // get the task index order from the taskList DOM
+    const title = elements.mainTitle.textContent;
     const taskids = projectContent.getListOrder();
-    // update the task array to match that order
-    const projectID = state.projectList.getProjectID(elements.mainTitle.textContent);
-    const taskList = state.projectList.getTaskList(projectID);
-    taskList.rearrangeTasks(taskids);
-    state.projectList.persistData();
-    // update the project list UI 
-    updateProjects();
+
+    if (title === 'Today') {
+        state.todayOrder.updateOrder(taskids);
+    } else if (title === 'Next 7 Days') {
+        state.weekOrder.updateOrder(taskids);
+    } else {
+        // update the task array to match the list order
+        const projectID = state.projectList.getProjectID(title);
+        const taskList = state.projectList.getTaskList(projectID);
+        taskList.rearrangeTasks(taskids);
+        state.projectList.persistData();
+        // update the project list UI 
+        updateProjects();
     }
 };
 
@@ -451,17 +503,35 @@ const updateTasks = () => {
  * Shortcuts controller
  */
 elements.todayShortcut.addEventListener('click', () => {
-    // get the tasks for today
-    const tasksArr = shortcuts.getTasks(state.projectList, 'today');
-    // show it in the main content UI
     shortcutsView.renderTitle('today');
-    projectContent.renderTasks(tasksArr, true);
+    projectContent.clearContents();
+
+    const numOfTasks = shortcuts.getTasks(state.projectList, 'today').length;
+    if (numOfTasks > 0) {
+        renderShortcutsContent('today');
+    }
 });
 
 elements.weekShortcut.addEventListener('click', () => {
-    // get the tasks for the next week
-    const weekTasks = shortcuts.getTasks(state.projectList, 'week');
-    // show it in the main content UI
     shortcutsView.renderTitle('week');
-    projectContent.renderTasks(weekTasks, true);
+    projectContent.clearContents();
+
+    const numOfTasks = shortcuts.getTasks(state.projectList, 'week').length;
+    if (numOfTasks > 0) {
+        renderShortcutsContent('week');
+    }
 });
+
+const renderShortcutsContent = option => {
+    let tasksArr;
+    if (option === 'today') {
+        tasksArr = shortcuts.getTasks(state.projectList, 'today');
+        tasksArr = state.todayOrder.rearrangeTasks(tasksArr);
+    } else {
+        tasksArr = shortcuts.getTasks(state.projectList, 'week');
+        tasksArr = state.weekOrder.rearrangeTasks(tasksArr);
+    }
+    projectContent.renderTasks(tasksArr, true);
+}
+
+// work on checkbox -- set it to update the today and week order regardless of current page

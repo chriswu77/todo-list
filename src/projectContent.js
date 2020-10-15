@@ -21,7 +21,7 @@ export const renderTasks = (taskArray, shortcut) => {
 
     taskArray.forEach(task => {
         const markup = `
-        <div class="tasks underline-gray" data-taskid="${task.id}" data-projectname="${task.projectName}">
+        <div class="tasks underline-gray ${persistDone(task.isDone)}" data-taskid="${task.id}" data-projectname="${task.projectName}">
             <div class="tasks-left ${persistLine(task.isDone)}">
 
                 <div class="pretty p-default p-round">
@@ -60,6 +60,8 @@ const calculateTime = dueDate => {
     const offset = new Date().getTimezoneOffset(); // 420 minutes / 7 hrs
     const newDate = addMinutes(oldDate, offset);
 
+    const test = addMinutes(newDate,offset*3);
+
     if (isToday(newDate)) {
         return 'Today'
     } else if (isTomorrow(newDate)) {
@@ -67,7 +69,7 @@ const calculateTime = dueDate => {
     } else if (isYesterday(newDate)) {
         return 'Yesterday'
     } else {
-        const time = formatDistanceToNow(newDate, {addSuffix: true});
+        const time = formatDistanceToNow(test, {addSuffix: true});
         return time
     }
 };
@@ -75,6 +77,10 @@ const calculateTime = dueDate => {
 export const clearPage = () => {
     elements.mainTitle.textContent = '';
     elements.titleBtns.innerHTML = '';
+    elements.taskList.innerHTML = '';
+};
+
+export const clearContents = () => {
     elements.taskList.innerHTML = '';
 };
 
@@ -133,10 +139,12 @@ export const toggleCheck = (taskid, isChecked) => {
         checkBox.checked = true;
         tasksLeft.classList.add('finished');
         time.classList.add('finished');
+        parentElement.classList.add('done');
     } else {
         checkBox.checked = false;
         tasksLeft.classList.remove('finished');
         time.classList.remove('finished');
+        parentElement.classList.remove('done');
     }
 };
 
@@ -144,24 +152,34 @@ export const getListOrder = () => {
     const tasks = Array.from(elements.taskList.querySelectorAll('.tasks'));
     const ids = tasks.map(task => task.dataset.taskid);
     return ids;
-    // console.log(ids);
-    // console.log(tasks);
 };
 
 const persistCheck = isDone => {
+    let markup = '';
     if (isDone) {
-        return 'checked'
+        markup = 'checked';
     }
+    return markup;
 };
 
 const persistLine = isDone => {
+    let markup = '';
     if (isDone) {
-        return 'finished'
+        markup = 'finished';
     }
+    return markup;
+};
+
+const persistDone = isDone => {
+    let markup = '';
+    if (isDone) {
+        markup = 'done';
+    }
+    return markup;
 };
 
 const setCheckBoxColor = priority => {
-    let markup;
+    let markup = '';
     if (priority === 'high') {
         markup = 'p-danger-o';
     } else if (priority === 'medium') {
@@ -173,7 +191,7 @@ const setCheckBoxColor = priority => {
 };
 
 const setFontColor = priority => {
-    let markup;
+    let markup = '';
     if (priority === 'high') {
         markup = 'danger';
     } else if (priority === 'medium') {
