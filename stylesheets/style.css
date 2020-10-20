@@ -120,7 +120,6 @@ html, body {
 }
 
 #add-container {
-    /* padding-top: 22px; */
     padding-top: 15px;
 }
 
@@ -194,15 +193,8 @@ html, body {
     align-items: center;
 }
 
-.checkbox {
-    /* width: 13px;
-    height: 13px;
-    margin-right: 10px; */
-}
-
 .time-remaining {
     box-sizing: border-box;
-    /* color: #528FE3; */
     color: #2d2d2d;
     padding: 4px;
     border: 1px solid #2d2d2d;
@@ -302,12 +294,8 @@ html, body {
     color: #d9534f;
 }
 
-.warning {
-    color: #f0ad4e;
-}
-
 .primary {
-    color: #428bca;
+    color: #428bca
 }
 
 .task-proj-name {
@@ -315,4 +303,18 @@ html, body {
     color: #2d2d2d;
     margin-right: 20px;  
     align-self: flex-end;
+}
+
+#today-container:hover, #week-container:hover, .click-proj:hover, .proj-items:hover, .highlight {
+    background-clip: content-box;
+    background-color: #FFFFFF;
+}
+
+.hover, .proj-items:hover, .bold {
+    font-weight: 500;
+}
+
+.tasks:hover, .highlight-task {
+    background-clip: content-box;
+    background-color: #FAFAFA;
 }
