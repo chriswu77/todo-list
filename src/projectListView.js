@@ -114,3 +114,38 @@ export const getArrow = projectid => {
     const arrow = parent.querySelector('.fa-chevron-right');
     return arrow;
 };
+
+export const applyActive = parent => {
+    removeActive();
+
+    const text = parent.querySelector('.proj-name');
+    const taskNum = parent.querySelector('.proj-task-num');
+
+    parent.classList.add('highlight');
+    text.classList.add('bold');
+    taskNum.classList.add('bold');
+};
+
+export const removeActive = () => {
+    const allProjs = Array.from(document.querySelectorAll('.click-proj'));
+    const allTitles = Array.from(document.querySelectorAll('.proj-name'));
+    const allTaskNums = Array.from(document.querySelectorAll('.proj-task-num'));
+
+    allProjs.forEach(box => box.classList.remove('highlight'));
+    allTitles.forEach(title => title.classList.remove('bold'));
+    allTaskNums.forEach(num => num.classList.remove('bold'));
+};
+
+export const applyTaskActive = taskid => {
+    removeTaskActive();
+
+    const taskDOM = elements.projectList.querySelector(`[data-taskid="${taskid}"]`);
+    taskDOM.classList.add('bold');
+    taskDOM.classList.add('highlight');
+};
+
+export const removeTaskActive = () => {
+    const allTasks = Array.from(elements.projectList.querySelectorAll('.proj-items'));
+    allTasks.forEach(task => task.classList.remove('bold'));
+    allTasks.forEach(task => task.classList.remove('highlight'));
+};

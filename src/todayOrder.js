@@ -1,3 +1,5 @@
+import {getTasks} from './shortcuts';
+
 export default class TodayOrder {
     constructor() {
         this.order = [];
@@ -32,14 +34,6 @@ export default class TodayOrder {
             })
     
             return newTaskArr;
-        }
-    }
-
-    isEmpty () {
-        if (this.order.length === 0) {
-            return true;
-        } else {
-            return false;
         }
     }
 

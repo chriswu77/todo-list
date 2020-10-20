@@ -107,21 +107,17 @@ export const editTask = (taskid, title, dueDate, priority, isDone) => {
     }
     if (priority) {
         titleElement.classList.remove('danger');
-        titleElement.classList.remove('warning');
         titleElement.classList.remove('primary');
 
         if (priority === 'high') {
             titleElement.classList.add('danger');
         } else if (priority === 'medium') {
-            titleElement.classList.add('warning');
-        } else {
             titleElement.classList.add('primary');
         }
 
         if (isDone) {
             const color = setCheckBoxColor(priority);
             checkBoxColor.classList.remove('p-danger-o');
-            checkBoxColor.classList.remove('p-warning-o');
             checkBoxColor.classList.remove('p-primary-o');
 
             checkBoxColor.classList.add(color);
@@ -183,8 +179,6 @@ const setCheckBoxColor = priority => {
     if (priority === 'high') {
         markup = 'p-danger-o';
     } else if (priority === 'medium') {
-        markup = 'p-warning-o';
-    } else {
         markup = 'p-primary-o';
     }
     return markup;
@@ -195,9 +189,29 @@ const setFontColor = priority => {
     if (priority === 'high') {
         markup = 'danger';
     } else if (priority === 'medium') {
-        markup = 'warning';
-    } else {
         markup = 'primary';
     }
     return markup;
+};
+
+export const applyActive = taskid => {
+    removeActive();
+
+    const taskDOM = elements.taskList.querySelector(`[data-taskid="${taskid}"]`);
+    const name = taskDOM.querySelector('.task-name');
+    const time = taskDOM.querySelector('.time-remaining');
+
+    taskDOM.classList.add('highlight-task');
+    name.classList.add('bold');
+    time.classList.add('bold');
+};
+
+export const removeActive = () => {
+    const allTasks = Array.from(document.querySelectorAll('.tasks'));
+    const allNames = Array.from(document.querySelectorAll('.task-name'));
+    const allTimes = Array.from(document.querySelectorAll('.time-remaining'));
+
+    allTasks.forEach(task => task.classList.remove('highlight-task'));
+    allNames.forEach(name => name.classList.remove('bold'));
+    allTimes.forEach(time => time.classList.remove('bold'));
 };
