@@ -60,7 +60,7 @@ const calculateTime = dueDate => {
     const offset = new Date().getTimezoneOffset(); // 420 minutes / 7 hrs
     const newDate = addMinutes(oldDate, offset);
 
-    const test = addMinutes(newDate,offset*3);
+    const test = addMinutes(newDate, offset);
 
     if (isToday(newDate)) {
         return 'Today'
