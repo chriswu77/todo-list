@@ -318,3 +318,7 @@ html, body {
     background-clip: content-box;
     background-color: #FAFAFA;
 }
+
+.task-name {
+    margin-left: -5px;
+}
