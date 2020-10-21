@@ -67,10 +67,9 @@ const setTextStyle = (priority, isDone) => {
     if (priority === 'high') {
         markup += 'danger';
     } else if (priority === 'medium') {
-        markup += 'warning';
-    } else {
         markup += 'primary';
     }
+    
     return markup;
 };
 
