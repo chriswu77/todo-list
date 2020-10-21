@@ -7,7 +7,7 @@ export const renderForm = (btn, projectName) => {
         ${getInputHTML(btn, projectName)}
         <div class="btn-container">
             <input type="button" class="cancel-btn" value="Cancel">
-            <input type="submit" class="submit-btn" vale="Submit">
+            <input type="submit" class="submit-btn" value="Submit">
         </div>
     </form>
     `;

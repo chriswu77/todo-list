@@ -78,7 +78,7 @@ const getFormHTML = (btn, projNamesArr, task) => {
             </div>
             <div class="btn-container-2">
                 <input type="button" class="cancel-btn" value="Cancel">
-                <input type="submit" class="submit-btn" vale="Submit">
+                <input type="submit" class="submit-btn" value="Submit">
             </div>
         </form>
         `;
@@ -107,7 +107,7 @@ const getFormHTML = (btn, projNamesArr, task) => {
             </div>
             <div class="btn-container-2">
                 <input type="button" class="cancel-btn" value="Cancel">
-                <input type="submit" class="submit-btn" vale="Submit">
+                <input type="submit" class="submit-btn" value="Submit">
             </div>
         </form>
         `;
